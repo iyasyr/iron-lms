@@ -1,0 +1,102 @@
+@startuml
+title IronLMS - Class Diagram (clean; fixed blocks)
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+left to right direction
+
+' ===== Classes (multi-line blocks only) =====
+abstract class User {
+  Long id
+  String email
+  String passwordHash
+  String fullName
+  Role role
+  Instant createdAt
+}
+
+class Student {
+  String studentNumber
+}
+
+class Instructor {
+  String bio
+}
+
+class Course {
+  Long id
+  String title
+  String description
+  CourseStatus status
+  Instant createdAt
+  Instant publishedAt
+}
+
+class Lesson {
+  Long id
+  String title
+  String contentUrl
+  int orderIndex
+}
+
+class Assignment {
+  Long id
+  String title
+  String instructions
+  Instant dueAt
+  int maxPoints
+  boolean allowLate
+}
+
+class Enrollment {
+  Long id
+  Instant enrolledAt
+  EnrollmentStatus status
+}
+
+class Submission {
+  Long id
+  Instant submittedAt
+  String artifactUrl
+  SubmissionStatus status
+  Integer score
+  String feedback
+  int version
+}
+
+enum Role {
+  ADMIN
+  INSTRUCTOR
+  STUDENT
+}
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+enum EnrollmentStatus {
+  ACTIVE
+  CANCELLED
+  COMPLETED
+}
+enum SubmissionStatus {
+  SUBMITTED
+  GRADED
+  RESUBMIT_REQUESTED
+}
+
+' ===== Inheritance =====
+User <|-- Student
+User <|-- Instructor
+
+' ===== Relationships =====
+Instructor "1" -down-> "0..*" Course : \ncreates
+Course     "1" -down-> "0..*" Lesson : \nhas
+Course     "1" -down-> "0..*" Assignment : \ncontains
+Assignment "1" -right-> "0..*" Submission : receives
+Submission "1" -left->  "1"   Student : \nauthoredBy
+Enrollment "1" -left->  "1"   Course  : \nfor
+
+
+@enduml
