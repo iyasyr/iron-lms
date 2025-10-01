@@ -1,5 +1,37 @@
-node_modules/
-**/target/
-**/dist/
-**/.env*
-**/.DS_Store
+# VCS / logs
+.git
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Node
+**/node_modules
+**/.vite
+**/dist
+**/build
+**/.eslintcache
+**/.turbo
+**/.parcel-cache
+
+# Java / Maven / Gradle
+**/target
+**/.gradle
+**/.mvn
+**/.classpath
+**/.project
+**/.settings
+**/.factorypath
+
+# Env files
+*.env
+**/.env
+
+# IDE / OS
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Docker
+**/.dockerignore-local

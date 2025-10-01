@@ -27,74 +27,70 @@ The system follows a well-structured domain model with clear relationships betwe
 
 ```mermaid
 classDiagram
-    class User {
-        <<abstract>>
-        +Long id
-        +String email
-        +String passwordHash
-        +String fullName
-        +Role role
-        +LocalDateTime createdAt
-    }
-    
-    class Student {
-        +String studentNumber
-    }
-    
-    class Instructor {
-        +String bio
-    }
-    
-    class Course {
-        +Long id
-        +String title
-        +String description
-        +CourseStatus status
-        +LocalDateTime createdAt
-        +LocalDateTime publishedAt
-    }
-    
-    class Lesson {
-        +Long id
-        +String title
-        +String contentUrl
-        +Integer orderIndex
-    }
-    
-    class Assignment {
-        +Long id
-        +String title
-        +String instructions
-        +LocalDateTime dueAt
-        +Integer maxPoints
-        +Boolean allowLate
-    }
-    
-    class Enrollment {
-        +Long id
-        +LocalDateTime enrolledAt
-        +EnrollmentStatus status
-    }
-    
-    class Submission {
-        +Long id
-        +LocalDateTime submittedAt
-        +String artifactUrl
-        +SubmissionStatus status
-        +Integer score
-        +String feedback
-        +Integer version
-    }
-    
-    User <|-- Student
-    User <|-- Instructor
-    Instructor --> Course : creates
-    Course --> Lesson : contains
-    Course --> Assignment : has
-    Student --> Enrollment : makes
-    Course --> Enrollment : receives
-    Assignment --> Submission : receives
-    Student --> Submission : submits
+  direction LR
+
+  class User {
+    <<abstract>>
+    +Long id
+    +String email
+    +String passwordHash
+    +String fullName
+    +Role role  // STUDENT, INSTRUCTOR, ADMIN
+    +LocalDateTime createdAt
+  }
+
+  class Student { +String studentNumber }
+  class Instructor { +String bio }
+
+  class Course {
+    +Long id
+    +String title
+    +String description
+    +CourseStatus status  // DRAFT, PUBLISHED, ARCHIVED
+    +LocalDateTime createdAt
+    +LocalDateTime publishedAt
+  }
+
+  class Lesson {
+    +Long id
+    +Long courseId
+    +String title
+    +String contentUrl
+    +Integer orderIndex
+  }
+
+  %% --- New LMS-meaningful Item ---
+  class LearningItem {
+    +Long id
+    +String title            // required
+    +String description
+    +Set<String> tags
+    +Visibility visibility   // PUBLIC, COURSE, PRIVATE
+    +Long ownerInstructorId  // who authored/owns it
+    +LocalDateTime createdAt
+    +LocalDateTime updatedAt
+  }
+
+  %% Relations (reuse and placement)
+  class CourseLearningItem {
+    +Long courseId
+    +Long itemId
+    +LocalDateTime attachedAt
+  }
+
+  class LessonLearningItem {
+    +Long lessonId
+    +Long itemId
+    +Integer orderIndex
+  }
+
+  User <|-- Student
+  User <|-- Instructor
+
+  Instructor "1" --> "many" LearningItem : owns
+  Course "many" --> "many" LearningItem : uses (via CourseLearningItem)
+  Lesson "many" --> "many" LearningItem : embeds (via LessonLearningItem)
+  Course "1" --> "many" Lesson : contains
 ```
 
 ### Entity Relationships
