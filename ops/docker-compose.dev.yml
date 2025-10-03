@@ -43,16 +43,16 @@ services:
     image: node:20-alpine
     container_name: ironlms-frontend-dev
     working_dir: /app
-    # deps ставим один раз, исходники монтируем томом (HMR)
+    # deps once (HMR)
     command: sh -lc "yarn install --frozen-lockfile && yarn dev --host 0.0.0.0 --port 5173"
     ports:
       - "5173:5173"
     environment:
-      VITE_API_URL: http://localhost:8080    # прямой вызов API из браузера
+      VITE_API_URL: http://localhost:8080
       YARN_CACHE_FOLDER: /tmp/.yarn-cache
     volumes:
       - ../frontend:/app
-      - /app/node_modules   # анонимный том: не затирать node_modules файлами хоста
+      - /app/node_modules   # anononim mode
       - yarn_cache:/tmp/.yarn-cache
     depends_on:
       backend:

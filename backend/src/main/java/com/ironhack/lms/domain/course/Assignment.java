@@ -7,8 +7,7 @@ import lombok.Setter;
 
 import java.time.Instant;
 
-@Getter @Setter
-@NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 @Entity
 @Table(name = "assignment")
 public class Assignment {
@@ -17,8 +16,8 @@ public class Assignment {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "course_id")
-    private Course course;
+    @JoinColumn(name = "lesson_id")
+    private Lesson lesson;
 
     @Column(nullable = false, length = 200)
     private String title;

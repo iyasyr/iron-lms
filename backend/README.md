@@ -35,18 +35,23 @@ classDiagram
     +String email
     +String passwordHash
     +String fullName
-    +Role role  // STUDENT, INSTRUCTOR, ADMIN
+    +Role role
     +LocalDateTime createdAt
   }
 
-  class Student { +String studentNumber }
-  class Instructor { +String bio }
+  class Student {
+    +String studentNumber
+  }
+
+  class Instructor {
+    +String bio
+  }
 
   class Course {
     +Long id
     +String title
     +String description
-    +CourseStatus status  // DRAFT, PUBLISHED, ARCHIVED
+    +CourseStatus status     // DRAFT | PUBLISHED | ARCHIVED
     +LocalDateTime createdAt
     +LocalDateTime publishedAt
   }
@@ -55,42 +60,66 @@ classDiagram
     +Long id
     +Long courseId
     +String title
-    +String contentUrl
     +Integer orderIndex
   }
 
-  %% --- New LMS-meaningful Item ---
-  class LearningItem {
+  %% One content doc per Lesson (Markdown)
+  class Item {
     +Long id
-    +String title            // required
+    +Long lessonId          // UNIQUE (1:1 with Lesson)
+    +String title           // required
     +String description
-    +Set<String> tags
-    +Visibility visibility   // PUBLIC, COURSE, PRIVATE
-    +Long ownerInstructorId  // who authored/owns it
+    +Set~String~ tags
+    +String bodyMarkdown    // lesson content in Markdown
     +LocalDateTime createdAt
     +LocalDateTime updatedAt
   }
 
-  %% Relations (reuse and placement)
-  class CourseLearningItem {
-    +Long courseId
-    +Long itemId
-    +LocalDateTime attachedAt
-  }
-
-  class LessonLearningItem {
+  class Assignment {
+    +Long id
     +Long lessonId
-    +Long itemId
-    +Integer orderIndex
+    +String title
+    +String instructions     // Markdown allowed
+    +LocalDateTime openAt    // optional availability window start
+    +LocalDateTime dueAt
+    +LocalDateTime closeAt   // optional availability window end
+    +Integer maxPoints
+    +Boolean allowLate
   }
 
+  class Enrollment {
+    +Long id
+    +Long courseId
+    +Long studentId
+    +LocalDateTime enrolledAt
+    +EnrollmentStatus status
+  }
+
+  class Submission {
+    +Long id
+    +Long assignmentId
+    +Long studentId
+    +LocalDateTime submittedAt
+    +String artifactUrl
+    +SubmissionStatus status
+    +Integer score
+    +String feedback
+    +Integer version
+  }
+
+  %% Inheritance
   User <|-- Student
   User <|-- Instructor
 
-  Instructor "1" --> "many" LearningItem : owns
-  Course "many" --> "many" LearningItem : uses (via CourseLearningItem)
-  Lesson "many" --> "many" LearningItem : embeds (via LessonLearningItem)
+  %% Relationships
+  Instructor "1" --> "many" Course : creates
   Course "1" --> "many" Lesson : contains
+  Lesson "1" --> "1" Item : has content
+  Lesson "1" --> "many" Assignment : has
+  Course "1" --> "many" Enrollment : receives
+  Student "1" --> "many" Enrollment : makes
+  Assignment "1" --> "many" Submission : receives
+  Student "1" --> "many" Submission : submits
 ```
 
 ### Entity Relationships

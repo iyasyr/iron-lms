@@ -4,14 +4,14 @@ WORKDIR /app
 COPY pom.xml .
 RUN mvn -q -e -DskipTests dependency:go-offline
 COPY src ./src
-# если есть swagger codegen/openapi, можно добавить генерацию до package
+# if there is swagger codegen/openapi, package can be added before the generation
 RUN mvn -q -DskipTests package
 
 # ---- runtime stage ----
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 ENV JAVA_OPTS=""
-# папка для логов
+# logs
 RUN mkdir -p /var/log/app
 COPY --from=build /app/target/*.jar /app/app.jar
 EXPOSE 8080

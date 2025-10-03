@@ -13,15 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.TestingAuthenticationToken;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,10 +64,10 @@ class CourseServiceTest {
             c.setCreatedAt(Instant.now());
             return c;
         });
-        
+
         var req = new CourseCreateRequest("New Course", "Description");
         var result = service.createCourse(req, ownerAuth);
-        
+
         assertEquals(999L, result.id());
         assertEquals("New Course", result.title());
         assertEquals(CourseStatus.DRAFT, result.status());
@@ -78,10 +77,10 @@ class CourseServiceTest {
     @Test
     void updateCourse_happyPath_updates() {
         when(courses.save(any(Course.class))).thenAnswer(inv -> inv.getArgument(0));
-        
+
         var req = new CourseUpdateRequest("Updated", "New desc", CourseStatus.PUBLISHED);
         var result = service.updateCourse(100L, req, ownerAuth);
-        
+
         assertEquals("Updated", course.getTitle());
         assertEquals("New desc", course.getDescription());
         assertEquals(CourseStatus.PUBLISHED, course.getStatus());
@@ -109,25 +108,35 @@ class CourseServiceTest {
             l.setId(50L);
             return l;
         });
-        
-        var req = new LessonCreateRequest("Lesson 1", "https://video.com", 1);
+
+        // LessonCreateRequest now: (title, orderIndex)
+        var req = new LessonCreateRequest("Lesson 1", 1);
         var lessonId = service.addLesson(100L, req, ownerAuth);
-        
+
         assertEquals(50L, lessonId);
         verify(lessons).save(any(Lesson.class));
     }
 
     @Test
     void addAssignment_happyPath_creates() {
+        // Create a lesson that belongs to course 100
+        Lesson l = new Lesson();
+        l.setId(50L);
+        l.setCourse(course);
+        l.setTitle("Lesson 1");
+        l.setOrderIndex(1);
+        when(lessons.findById(50L)).thenReturn(Optional.of(l));
+
         when(assignments.save(any(Assignment.class))).thenAnswer(inv -> {
             Assignment a = inv.getArgument(0);
             a.setId(60L);
             return a;
         });
-        
-        var req = new AssignmentCreateRequest("HW1", "Instructions", null, 100, true);
+
+        // AssignmentCreateRequest now: (lessonId, title, instructions, dueAt, maxPoints, allowLate)
+        var req = new AssignmentCreateRequest(50L, "HW1", "Instructions", null, 100, true);
         var assignmentId = service.addAssignment(100L, req, ownerAuth);
-        
+
         assertEquals(60L, assignmentId);
         verify(assignments).save(any(Assignment.class));
     }
@@ -138,7 +147,8 @@ class CourseServiceTest {
         l.setId(5L); l.setCourse(course); l.setTitle("old"); l.setOrderIndex(1);
         when(lessons.findById(5L)).thenReturn(Optional.of(l));
 
-        var req = new LessonUpdateRequest("new", "https://x", 2);
+        // LessonUpdateRequest now: (title, orderIndex)
+        var req = new LessonUpdateRequest("new", 2);
         assertDoesNotThrow(() -> service.updateLesson(100L, 5L, req, ownerAuth));
 
         assertEquals("new", l.getTitle());
@@ -148,8 +158,15 @@ class CourseServiceTest {
 
     @Test
     void deleteAssignment_happyPath_deletes() {
+        // Assignment must point to Lesson -> Course for the ownership check
+        Lesson l = new Lesson();
+        l.setId(5L);
+        l.setCourse(course);
+
         Assignment a = new Assignment();
-        a.setId(7L); a.setCourse(course);
+        a.setId(7L);
+        a.setLesson(l);
+
         when(assignments.findById(7L)).thenReturn(Optional.of(a));
 
         assertDoesNotThrow(() -> service.deleteAssignment(100L, 7L, ownerAuth));
@@ -160,13 +177,13 @@ class CourseServiceTest {
     void listLessonsForRead_published_works() {
         Lesson lesson = new Lesson();
         lesson.setId(1L);
+        lesson.setCourse(course);
         lesson.setTitle("Lesson 1");
-        lesson.setContentUrl("https://example.com");
         lesson.setOrderIndex(1);
-        
+
         when(lessons.findByCourse_IdOrderByOrderIndexAsc(100L))
-            .thenReturn(List.of(lesson));
-        
+                .thenReturn(List.of(lesson));
+
         var result = service.listLessonsForRead(100L, null);
         assertEquals(1, result.size());
         assertEquals("Lesson 1", result.get(0).title());
@@ -174,16 +191,22 @@ class CourseServiceTest {
 
     @Test
     void listAssignmentsForRead_published_works() {
+        // Build Assignment -> Lesson -> Course chain
+        Lesson l = new Lesson();
+        l.setId(1L);
+        l.setCourse(course);
+
         Assignment assignment = new Assignment();
         assignment.setId(1L);
+        assignment.setLesson(l);
         assignment.setTitle("HW1");
         assignment.setInstructions("Do this");
         assignment.setMaxPoints(100);
         assignment.setAllowLate(true);
-        
-        when(assignments.findByCourse_Id(100L))
-            .thenReturn(List.of(assignment));
-        
+
+        when(assignments.findByLesson_Course_Id(100L))
+                .thenReturn(List.of(assignment));
+
         var result = service.listAssignmentsForRead(100L, null);
         assertEquals(1, result.size());
         assertEquals("HW1", result.get(0).title());
