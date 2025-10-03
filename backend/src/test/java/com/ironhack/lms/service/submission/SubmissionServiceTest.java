@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.web.server.ResponseStatusException;
@@ -52,22 +53,50 @@ class SubmissionServiceTest {
 
     @BeforeEach
     void setup() {
-        student = new Student(); student.setId(30L); student.setEmail("s@lms.local"); student.setRole(Role.STUDENT);
-        instr   = new Instructor(); instr.setId(40L); instr.setEmail("i@lms.local"); instr.setRole(Role.INSTRUCTOR);
+        // users
+        student = new Student();
+        student.setId(30L);
+        student.setEmail("s@lms.local");
+        student.setRole(Role.STUDENT);
 
+        instr = new Instructor();
+        instr.setId(40L);
+        instr.setEmail("i@lms.local");
+        instr.setRole(Role.INSTRUCTOR);
+
+        // course
         course = new Course();
-        course.setId(200L); course.setInstructor(instr);
-        course.setStatus(CourseStatus.PUBLISHED); course.setPublishedAt(Instant.now());
+        course.setId(200L);
+        course.setInstructor(instr);
+        course.setStatus(CourseStatus.PUBLISHED);
+        course.setPublishedAt(Instant.now());
 
-        hw = new Assignment(); hw.setId(300L); hw.setCourse(course); hw.setMaxPoints(100); hw.setAllowLate(true);
+        // lesson linked to course
+        Lesson lesson = new Lesson();
+        lesson.setId(10L);
+        lesson.setCourse(course);
+        lesson.setTitle("Lesson 1");
+        lesson.setOrderIndex(1);
 
+        // assignment now links to lesson (not course)
+        hw = new Assignment();
+        hw.setId(300L);
+        hw.setLesson(lesson);
+        hw.setMaxPoints(100);
+        hw.setAllowLate(true);
+
+        // mocks
         when(users.findByEmail(student.getEmail())).thenReturn(Optional.of(student));
         when(users.findByEmail(instr.getEmail())).thenReturn(Optional.of(instr));
         when(assignments.findById(300L)).thenReturn(Optional.of(hw));
 
+        // if you call submit() in tests, you likely also need:
+        // when(enrollments.existsByCourse_IdAndStudent_Id(200L, 30L)).thenReturn(true);
+
         studentAuth = new TestingAuthenticationToken(student.getEmail(), "x");
         instrAuth   = new TestingAuthenticationToken(instr.getEmail(), "x");
     }
+
 
     @Test
     void submit_ok_createsOrUpdates_and_versionBumps() {
@@ -122,8 +151,23 @@ class SubmissionServiceTest {
 
     @Test
     void listByCourse_instructor_works() {
+        // instructor owns course 200
         when(courses.existsByIdAndInstructor_Id(200L, instr.getId())).thenReturn(true);
-        Submission submission = new Submission();
+
+        // --- build nested relation: Assignment -> Lesson -> Course ---
+        var course = new Course();
+        course.setId(200L);
+
+        var lesson = new Lesson();
+        lesson.setId(10L);
+        lesson.setCourse(course);
+
+        var hw = new Assignment();
+        hw.setId(99L);
+        hw.setLesson(lesson);
+        hw.setMaxPoints(100);
+
+        var submission = new Submission();
         submission.setId(1L);
         submission.setAssignment(hw);
         submission.setStudent(student);
@@ -132,14 +176,19 @@ class SubmissionServiceTest {
         submission.setStatus(SubmissionStatus.SUBMITTED);
         submission.setVersion(1);
 
-        when(submissions.findByAssignment_Course_Id(eq(200L), any(PageRequest.class)))
+        // repo path and Pageable matcher
+        when(submissions.findByAssignment_Lesson_Course_Id(eq(200L), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(submission)));
 
         var result = service.listByCourse(200L, instrAuth, PageRequest.of(0, 10));
+
         assertNotNull(result);
         assertFalse(result.isEmpty());
         assertEquals(1, result.getTotalElements());
+        // optional: verify mapping includes course id 200
+        assertEquals(200L, result.getContent().get(0).courseId());
     }
+
 
     @Test
     void mySubmissions_student_works() {

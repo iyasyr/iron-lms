@@ -4,6 +4,7 @@ import com.ironhack.lms.domain.course.*;
 import com.ironhack.lms.domain.user.*;
 import com.ironhack.lms.repository.course.AssignmentRepository;
 import com.ironhack.lms.repository.course.CourseRepository;
+import com.ironhack.lms.repository.course.LessonRepository; // <-- add
 import com.ironhack.lms.repository.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,32 +14,28 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.Instant;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TestDataInitializerTest {
 
-    @Mock
-    private PasswordEncoder encoder;
-
-    @Mock
-    private UserRepository users;
-
-    @Mock
-    private CourseRepository courses;
-
-    @Mock
-    private AssignmentRepository assignments;
+    @Mock private PasswordEncoder encoder;
+    @Mock private UserRepository users;
+    @Mock private CourseRepository courses;
+    @Mock private LessonRepository lessons;        // <-- add
+    @Mock private AssignmentRepository assignments;
 
     private TestDataInitializer initializer;
 
     @BeforeEach
     void setUp() {
-        initializer = new TestDataInitializer(encoder, users, courses, assignments);
+        // pass lessons to the constructor
+        initializer = new TestDataInitializer(encoder, users, courses, lessons, assignments);
     }
 
     @Test
@@ -53,12 +50,23 @@ class TestDataInitializerTest {
         when(users.findByEmail("student@lms.local")).thenReturn(Optional.of(student));
         when(courses.count()).thenReturn(0L);
 
-        Course course = new Course();
-        course.setId(1L);
-        when(courses.save(any(Course.class))).thenReturn(course);
+        // course save returns course with id
+        when(courses.save(any(Course.class))).thenAnswer(inv -> {
+            Course c = inv.getArgument(0);
+            c.setId(1L);
+            return c;
+        });
 
-        Assignment assignment = new Assignment();
-        when(assignments.save(any(Assignment.class))).thenReturn(assignment);
+        // lesson save returns lesson with id
+        when(lessons.save(any(Lesson.class))).thenAnswer(inv -> {
+            Lesson l = inv.getArgument(0);
+            l.setId(10L);
+            return l;
+        });
+
+        // allow assignment creation
+        when(assignments.findByLesson_Id(anyLong())).thenReturn(Collections.emptyList());
+        when(assignments.save(any(Assignment.class))).thenAnswer(inv -> inv.getArgument(0));
 
         CommandLineRunner runner = initializer.testSeed();
 
@@ -69,6 +77,7 @@ class TestDataInitializerTest {
         verify(users, never()).save(any(Instructor.class));
         verify(users, never()).save(any(Student.class));
         verify(courses).save(any(Course.class));
+        verify(lessons).save(any(Lesson.class));          // optional but accurate
         verify(assignments).save(any(Assignment.class));
     }
 
@@ -80,19 +89,27 @@ class TestDataInitializerTest {
         when(courses.count()).thenReturn(0L);
         when(encoder.encode("password")).thenReturn("encoded-password");
 
-        Instructor savedInstructor = new Instructor();
-        savedInstructor.setId(1L);
-        when(users.save(any(Instructor.class))).thenReturn(savedInstructor);
+        when(users.save(any(Instructor.class))).thenAnswer(inv -> {
+            Instructor i = inv.getArgument(0);
+            i.setId(1L);
+            return i;
+        });
+        when(users.save(any(Student.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Student savedStudent = new Student();
-        when(users.save(any(Student.class))).thenReturn(savedStudent);
+        when(courses.save(any(Course.class))).thenAnswer(inv -> {
+            Course c = inv.getArgument(0);
+            c.setId(1L);
+            return c;
+        });
 
-        Course course = new Course();
-        course.setId(1L);
-        when(courses.save(any(Course.class))).thenReturn(course);
+        when(lessons.save(any(Lesson.class))).thenAnswer(inv -> {
+            Lesson l = inv.getArgument(0);
+            l.setId(10L);
+            return l;
+        });
 
-        Assignment assignment = new Assignment();
-        when(assignments.save(any(Assignment.class))).thenReturn(assignment);
+        when(assignments.findByLesson_Id(anyLong())).thenReturn(Collections.emptyList());
+        when(assignments.save(any(Assignment.class))).thenAnswer(inv -> inv.getArgument(0));
 
         CommandLineRunner runner = initializer.testSeed();
 
@@ -103,6 +120,7 @@ class TestDataInitializerTest {
         verify(users).save(any(Instructor.class));
         verify(users).save(any(Student.class));
         verify(courses).save(any(Course.class));
+        verify(lessons).save(any(Lesson.class));          // optional
         verify(assignments).save(any(Assignment.class));
     }
 
@@ -125,6 +143,7 @@ class TestDataInitializerTest {
 
         // Then
         verify(courses, never()).save(any(Course.class));
+        verify(lessons, never()).save(any(Lesson.class));
         verify(assignments, never()).save(any(Assignment.class));
     }
 
@@ -140,16 +159,20 @@ class TestDataInitializerTest {
         when(users.findByEmail("student@lms.local")).thenReturn(Optional.of(student));
         when(courses.count()).thenReturn(0L);
 
-        Course course = new Course();
-        course.setId(1L);
-        when(courses.save(any(Course.class))).thenAnswer(invocation -> {
-            Course c = invocation.getArgument(0);
+        when(courses.save(any(Course.class))).thenAnswer(inv -> {
+            Course c = inv.getArgument(0);
             c.setId(1L);
             return c;
         });
 
-        Assignment assignment = new Assignment();
-        when(assignments.save(any(Assignment.class))).thenReturn(assignment);
+        when(lessons.save(any(Lesson.class))).thenAnswer(inv -> {
+            Lesson l = inv.getArgument(0);
+            l.setId(10L);
+            return l;
+        });
+
+        when(assignments.findByLesson_Id(anyLong())).thenReturn(Collections.emptyList());
+        when(assignments.save(any(Assignment.class))).thenAnswer(inv -> inv.getArgument(0));
 
         CommandLineRunner runner = initializer.testSeed();
 
@@ -157,11 +180,11 @@ class TestDataInitializerTest {
         runner.run();
 
         // Then
-        verify(courses).save(argThat(courseArg -> 
-            "Published Test Course".equals(courseArg.getTitle()) &&
-            "For ITs".equals(courseArg.getDescription()) &&
-            CourseStatus.PUBLISHED.equals(courseArg.getStatus()) &&
-            courseArg.getPublishedAt() != null
+        verify(courses).save(argThat(courseArg ->
+                "Published Test Course".equals(courseArg.getTitle()) &&
+                        "For ITs".equals(courseArg.getDescription()) &&
+                        CourseStatus.PUBLISHED.equals(courseArg.getStatus()) &&
+                        courseArg.getPublishedAt() != null
         ));
     }
 
@@ -177,16 +200,20 @@ class TestDataInitializerTest {
         when(users.findByEmail("student@lms.local")).thenReturn(Optional.of(student));
         when(courses.count()).thenReturn(0L);
 
-        Course course = new Course();
-        course.setId(1L);
-        when(courses.save(any(Course.class))).thenAnswer(invocation -> {
-            Course c = invocation.getArgument(0);
+        when(courses.save(any(Course.class))).thenAnswer(inv -> {
+            Course c = inv.getArgument(0);
             c.setId(1L);
             return c;
         });
 
-        Assignment assignment = new Assignment();
-        when(assignments.save(any(Assignment.class))).thenReturn(assignment);
+        when(lessons.save(any(Lesson.class))).thenAnswer(inv -> {
+            Lesson l = inv.getArgument(0);
+            l.setId(10L);
+            return l;
+        });
+
+        when(assignments.findByLesson_Id(anyLong())).thenReturn(Collections.emptyList());
+        when(assignments.save(any(Assignment.class))).thenAnswer(inv -> inv.getArgument(0));
 
         CommandLineRunner runner = initializer.testSeed();
 
@@ -194,11 +221,13 @@ class TestDataInitializerTest {
         runner.run();
 
         // Then
-        verify(assignments).save(argThat(assignmentArg -> 
-            "HW1".equals(assignmentArg.getTitle()) &&
-            "Submit URL".equals(assignmentArg.getInstructions()) &&
-            Integer.valueOf(100).equals(assignmentArg.getMaxPoints()) &&
-            assignmentArg.isAllowLate()
+        verify(assignments).save(argThat(assignmentArg ->
+                "HW1".equals(assignmentArg.getTitle()) &&
+                        "Submit URL".equals(assignmentArg.getInstructions()) &&
+                        Integer.valueOf(100).equals(assignmentArg.getMaxPoints()) &&
+                        assignmentArg.isAllowLate() &&
+                        assignmentArg.getLesson() != null &&                    // ensure linked to a lesson
+                        assignmentArg.getLesson().getId() != null
         ));
     }
 }

@@ -1,10 +1,10 @@
-// src/main/java/com/ironhack/lms/config/TestDataInitializer.java
 package com.ironhack.lms.config;
 
 import com.ironhack.lms.domain.course.*;
 import com.ironhack.lms.domain.user.*;
 import com.ironhack.lms.repository.course.AssignmentRepository;
 import com.ironhack.lms.repository.course.CourseRepository;
+import com.ironhack.lms.repository.course.LessonRepository;
 import com.ironhack.lms.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -23,14 +23,16 @@ public class TestDataInitializer {
     private final PasswordEncoder encoder;
     private final UserRepository users;
     private final CourseRepository courses;
+    private final LessonRepository lessons;
     private final AssignmentRepository assignments;
 
     @Bean
     CommandLineRunner testSeed() {
         return args -> {
-            // users
+            // --- users ---
             Instructor instructor = users.findByEmail("instructor@lms.local")
-                    .map(u -> (Instructor) u).orElseGet(() -> {
+                    .map(u -> (Instructor) u)
+                    .orElseGet(() -> {
                         var i = new Instructor();
                         i.setEmail("instructor@lms.local");
                         i.setPasswordHash(encoder.encode("password"));
@@ -50,8 +52,9 @@ public class TestDataInitializer {
                 return users.save(s);
             });
 
-            // one published course + one assignment
+            // --- one published course + one lesson + one assignment ---
             if (courses.count() == 0) {
+                // Course
                 var c = new Course();
                 c.setInstructor(instructor);
                 c.setTitle("Published Test Course");
@@ -60,13 +63,23 @@ public class TestDataInitializer {
                 c.setPublishedAt(Instant.now());
                 c = courses.save(c);
 
-                var a = new Assignment();
-                a.setCourse(c);
-                a.setTitle("HW1");
-                a.setInstructions("Submit URL");
-                a.setMaxPoints(100);
-                a.setAllowLate(true);
-                assignments.save(a);
+                // Lesson (since Assignment now links to Lesson)
+                var l = new Lesson();
+                l.setCourse(c);
+                l.setTitle("Lesson 1");
+                l.setOrderIndex(1);
+                l = lessons.save(l);
+
+                // Assignment linked to the lesson
+                if (assignments.findByLesson_Id(l.getId()).isEmpty()) {
+                    var a = new Assignment();
+                    a.setLesson(l);
+                    a.setTitle("HW1");
+                    a.setInstructions("Submit URL");
+                    a.setMaxPoints(100);
+                    a.setAllowLate(true);
+                    assignments.save(a);
+                }
             }
             // no enrollment seeding here
         };

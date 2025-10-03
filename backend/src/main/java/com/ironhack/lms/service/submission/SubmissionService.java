@@ -2,6 +2,7 @@ package com.ironhack.lms.service.submission;
 
 import com.ironhack.lms.domain.course.Assignment;
 import com.ironhack.lms.domain.course.Course;
+import com.ironhack.lms.domain.course.CourseStatus;
 import com.ironhack.lms.domain.submission.Submission;
 import com.ironhack.lms.domain.submission.SubmissionStatus;
 import com.ironhack.lms.domain.user.*;
@@ -41,10 +42,12 @@ public class SubmissionService {
 
         Assignment a = assignments.findById(assignmentId)
                 .orElseThrow(() -> notFound("Assignment"));
-        Course c = a.getCourse();
+
+        // course now comes via lesson
+        Course c = a.getLesson().getCourse();
 
         // Must be published course
-        if (c.getStatus() != com.ironhack.lms.domain.course.CourseStatus.PUBLISHED) {
+        if (c.getStatus() != CourseStatus.PUBLISHED) {
             throw notFound("Assignment");
         }
         // Must be enrolled & active
@@ -82,14 +85,15 @@ public class SubmissionService {
     public Page<SubmissionResponse> listByCourse(Long courseId, Authentication auth, Pageable pageable) {
         User who = requireAuth(auth);
         if (!canAccessCourseSubmissions(who, courseId)) throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        return submissions.findByAssignment_Course_Id(courseId, pageable).map(this::toDto);
+        // path goes through assignment -> lesson -> course
+        return submissions.findByAssignment_Lesson_Course_Id(courseId, pageable).map(this::toDto);
     }
 
     @Transactional
     public SubmissionResponse grade(Long submissionId, GradeRequest req, Authentication auth) {
         User who = requireAuth(auth);
         Submission s = submissions.findById(submissionId).orElseThrow(() -> notFound("Submission"));
-        if (!canAccessCourseSubmissions(who, s.getAssignment().getCourse().getId()))
+        if (!canAccessCourseSubmissions(who, s.getAssignment().getLesson().getCourse().getId()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 
         int max = s.getAssignment().getMaxPoints();
@@ -100,8 +104,6 @@ public class SubmissionService {
         s.setFeedback(req.feedback());
         s.setStatus(SubmissionStatus.GRADED);
         s = submissions.save(s);
-
-        // Optional: trigger completion evaluation here (future iteration)
         return toDto(s);
     }
 
@@ -109,7 +111,7 @@ public class SubmissionService {
     public SubmissionResponse requestResubmission(Long submissionId, ResubmitRequest req, Authentication auth) {
         User who = requireAuth(auth);
         Submission s = submissions.findById(submissionId).orElseThrow(() -> notFound("Submission"));
-        if (!canAccessCourseSubmissions(who, s.getAssignment().getCourse().getId()))
+        if (!canAccessCourseSubmissions(who, s.getAssignment().getLesson().getCourse().getId()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 
         s.setStatus(SubmissionStatus.RESUBMIT_REQUESTED);
@@ -148,7 +150,7 @@ public class SubmissionService {
         return new SubmissionResponse(
                 s.getId(),
                 s.getAssignment().getId(),
-                s.getAssignment().getCourse().getId(),
+                s.getAssignment().getLesson().getCourse().getId(),
                 s.getStudent().getId(),
                 s.getSubmittedAt(),
                 s.getArtifactUrl(),

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.*;
 import java.time.Instant;
 
 public record AssignmentCreateRequest(
+        @NotNull Long lessonId,
         @NotBlank @Size(max = 200) String title,
         @Size(max = 50000) String instructions,
         Instant dueAt,
