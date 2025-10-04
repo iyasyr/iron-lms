@@ -134,6 +134,18 @@
 			<version>RELEASE</version>
 			<scope>compile</scope>
 		</dependency>
+		<!-- GraphQL runtime -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-graphql</artifactId>
+		</dependency>
+
+		<!-- Extra scalars (DateTime, URL, etc.) -->
+		<dependency>
+			<groupId>com.graphql-java</groupId>
+			<artifactId>graphql-java-extended-scalars</artifactId>
+			<version>22.0</version>
+		</dependency>
 
 		<!-- dev only -->
 		<dependency>

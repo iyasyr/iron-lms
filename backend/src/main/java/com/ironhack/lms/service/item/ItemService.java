@@ -6,30 +6,95 @@ import com.ironhack.lms.domain.course.Lesson;
 import com.ironhack.lms.domain.item.Item;
 import com.ironhack.lms.repository.course.LessonRepository;
 import com.ironhack.lms.repository.item.ItemRepository;
-import com.ironhack.lms.repository.item.ItemSpecifications;
 import com.ironhack.lms.web.item.dto.ItemCreateRequest;
 import com.ironhack.lms.web.item.dto.ItemListResponse;
 import com.ironhack.lms.web.item.dto.ItemResponse;
 import com.ironhack.lms.web.item.dto.ItemUpdateRequest;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class ItemService {
-    private final ItemRepository repo;
+
+    private final ItemRepository items;
     private final LessonRepository lessons;
     private final MarkdownService md;
     private final HtmlSanitizer sanitizer;
+
+    // ---------- entity-oriented methods used by GraphQL ----------
+
+    @Transactional
+    public Item createEntity(Long lessonId, String title, String description, Set<String> tags, String bodyMarkdown) {
+        Lesson lesson = lessons.findById(lessonId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
+
+        if (items.existsByLesson_Id(lessonId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Lesson already has an Item (1:1)");
+        }
+
+        Item i = new Item();
+        i.setLesson(lesson);
+        i.setTitle(title);
+        i.setDescription(description);
+        i.setTags(tags != null ? new LinkedHashSet<>(tags) : new LinkedHashSet<>());
+        i.setBodyMarkdown(bodyMarkdown);
+        i.setBodyHtml(sanitizer.sanitize(md.toHtml(bodyMarkdown)));
+
+        return items.save(i);
+    }
+
+    @Transactional
+    public Item updateEntity(Long id, String title, String description, Set<String> tags, String bodyMarkdown) {
+        Item i = items.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
+
+        if (title != null)       i.setTitle(title);
+        if (description != null) i.setDescription(description);
+        if (tags != null) {
+            i.getTags().clear();
+            i.getTags().addAll(tags);
+        }
+        if (bodyMarkdown != null) {
+            i.setBodyMarkdown(bodyMarkdown);
+            i.setBodyHtml(sanitizer.sanitize(md.toHtml(bodyMarkdown)));
+        }
+
+        return items.save(i);
+    }
+
+    @Transactional(readOnly = true)
+    public Item getEntity(Long id) {
+        return items.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Item> searchEntities(String search, Pageable pageable) {
+        Specification<Item> spec = ItemSpecifications.titleOrTagContains(search);
+        return items.findAll(spec, pageable);
+    }
+
+    // ---------- REST-oriented methods (DTO in/out) ----------
 
     @Transactional
     public ItemResponse create(ItemCreateRequest req) {
         Lesson lesson = lessons.findById(req.lessonId())
                 .orElseThrow(() -> new EntityNotFoundException("Lesson not found: " + req.lessonId()));
+
+        if (items.existsByLesson_Id(req.lessonId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Lesson already has an Item (1:1)");
+        }
 
         Item entity = new Item();
         entity.setLesson(lesson);
@@ -38,23 +103,21 @@ public class ItemService {
         entity.getTags().clear();
         if (req.tags() != null) entity.getTags().addAll(req.tags());
         entity.setBodyMarkdown(req.bodyMarkdown());
+        entity.setBodyHtml(sanitizer.sanitize(md.toHtml(req.bodyMarkdown())));
 
-        String html = sanitizer.sanitize(md.toHtml(req.bodyMarkdown()));
-        entity.setBodyHtml(html);
-
-        Item saved = repo.save(entity);
+        Item saved = items.save(entity);
         return toResponse(saved);
     }
 
     @Transactional(readOnly = true)
     public ItemResponse get(Long id) {
-        return repo.findById(id).map(this::toResponse)
+        return items.findById(id).map(this::toResponse)
                 .orElseThrow(() -> new EntityNotFoundException("Item not found: " + id));
     }
 
     @Transactional
     public ItemResponse update(Long id, ItemUpdateRequest req) {
-        Item e = repo.findById(id)
+        Item e = items.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Item not found: " + id));
 
         if (req.title() != null) e.setTitle(req.title());
@@ -64,25 +127,45 @@ public class ItemService {
             e.setBodyMarkdown(req.bodyMarkdown());
             e.setBodyHtml(sanitizer.sanitize(md.toHtml(req.bodyMarkdown())));
         }
+
+        e = items.save(e);
         return toResponse(e);
     }
 
     @Transactional
-    public void delete(Long id) { repo.deleteById(id); }
+    public void delete(Long id) {
+        items.deleteById(id);
+    }
 
     @Transactional(readOnly = true)
     public Page<ItemListResponse> search(String search, Pageable pageable) {
-        Specification<Item> spec = ItemSpecifications.titleContains(search)
-                .or(ItemSpecifications.tagsContain(search));
-
-        return repo.findAll(spec, pageable).map(this::toListResponse);
+        Specification<Item> spec = ItemSpecifications.titleOrTagContains(search);
+        return items.findAll(spec, pageable).map(this::toListResponse);
     }
+
+    // ---------- mappers ----------
 
     private ItemListResponse toListResponse(Item e) {
-        return new ItemListResponse(e.getId(), e.getLesson().getId(), e.getTitle(), e.getTags(), e.getUpdatedAt());
+        return new ItemListResponse(
+                e.getId(),
+                e.getLesson().getId(),
+                e.getTitle(),
+                e.getTags(),
+                e.getUpdatedAt()
+        );
     }
+
     private ItemResponse toResponse(Item e) {
-        return new ItemResponse(e.getId(), e.getLesson().getId(), e.getTitle(), e.getDescription(),
-                e.getTags(), e.getBodyMarkdown(), e.getBodyHtml(), e.getCreatedAt(), e.getUpdatedAt());
+        return new ItemResponse(
+                e.getId(),
+                e.getLesson().getId(),
+                e.getTitle(),
+                e.getDescription(),
+                e.getTags(),
+                e.getBodyMarkdown(),
+                e.getBodyHtml(),
+                e.getCreatedAt(),
+                e.getUpdatedAt()
+        );
     }
 }

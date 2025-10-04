@@ -44,6 +44,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/courses/*").permitAll()  // Only public course details (single course by ID)
                         .requestMatchers(HttpMethod.GET, "/api/courses/*/lessons").authenticated()  // Lessons require auth
                         .requestMatchers(HttpMethod.GET, "/api/courses/*/assignments").authenticated()  // Assignments require auth
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/graphql").permitAll() // or authenticated if you want
+                        .requestMatchers("/graphiql", "/graphiql/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(e -> e
