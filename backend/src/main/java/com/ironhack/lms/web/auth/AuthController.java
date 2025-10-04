@@ -37,7 +37,7 @@ public class AuthController {
                     description = "Login successful",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = LoginResponse.class),
+                            schema = @Schema(implementation = com.ironhack.lms.web.auth.LoginResponse.class),
                             examples = @ExampleObject(
                                     name = "Successful Login",
                                     value = "{\"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"}"
@@ -68,10 +68,10 @@ public class AuthController {
             )
     })
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest req) {
+    public ResponseEntity<com.ironhack.lms.web.auth.LoginResponse> login(@Valid @RequestBody com.ironhack.lms.web.auth.LoginRequest req) {
         Authentication auth = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(req.email(), req.password()));
         String token = jwt.generateToken((UserDetails) auth.getPrincipal());
-        return ResponseEntity.ok(new LoginResponse(token));
+        return ResponseEntity.ok(new com.ironhack.lms.web.auth.LoginResponse(token));
     }
 }

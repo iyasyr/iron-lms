@@ -1,0 +1,11 @@
+extend type Query {
+  lesson(id: ID!): Lesson
+}
+
+type Lesson {
+  id: ID!
+  courseId: ID!
+  title: String!
+  orderIndex: Int!
+  item: Item     # resolved via @SchemaMapping (1:1)
+}

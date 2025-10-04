@@ -1,0 +1,42 @@
+type Item {
+  id: ID!
+  lessonId: ID!
+  title: String!
+  description: String
+  tags: [String!]!
+  bodyMarkdown: String!
+  bodyHtml: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type ItemPage {
+  content: [Item!]!
+  pageInfo: PageInfo!
+}
+
+input ItemCreateInput {
+  lessonId: ID!
+  title: String!
+  description: String
+  tags: [String!]
+  bodyMarkdown: String!
+}
+
+input ItemUpdateInput {
+  title: String
+  description: String
+  tags: [String!]
+  bodyMarkdown: String
+}
+
+extend type Query {
+  items(search: String, page: Int = 0, pageSize: Int = 10): ItemPage!
+  item(id: ID!): Item
+}
+
+extend type Mutation {
+  createItem(input: ItemCreateInput!): Item!
+  updateItem(id: ID!, input: ItemUpdateInput!): Item!
+  deleteItem(id: ID!): Boolean!
+}

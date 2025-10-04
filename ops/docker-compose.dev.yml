@@ -11,8 +11,9 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data_dev:/var/lib/mysql
+
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-papppass"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot"]
       interval: 5s
       timeout: 3s
       retries: 30

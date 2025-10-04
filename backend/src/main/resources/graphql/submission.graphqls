@@ -1,0 +1,28 @@
+extend type Query {
+  mySubmissions(page: Int! = 0, pageSize: Int! = 10): SubmissionPage!
+  submissionsByCourse(courseId: ID!, page: Int! = 0, pageSize: Int! = 10): SubmissionPage!
+}
+
+extend type Mutation {
+  submit(assignmentId: ID!, artifactUrl: String!): Submission!
+  gradeSubmission(id: ID!, score: Int!, feedback: String): Submission!
+  requestResubmission(id: ID!, feedback: String): Submission!
+}
+
+type Submission {
+  id: ID!
+  assignmentId: ID!
+  courseId: ID!
+  studentId: ID!
+  submittedAt: DateTime!
+  artifactUrl: String!
+  status: String!
+  score: Int
+  feedback: String
+  version: Int!
+}
+
+type SubmissionPage {
+  content: [Submission!]!
+  pageInfo: PageInfo!
+}
