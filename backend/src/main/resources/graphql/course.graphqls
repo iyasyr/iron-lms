@@ -6,6 +6,7 @@ extend type Query {
 type Course {
   id: ID!
   instructorId: ID!
+  instructor: Instructor!
   title: String!
   description: String
   status: String!

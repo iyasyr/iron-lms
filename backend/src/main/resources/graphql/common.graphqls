@@ -13,3 +13,10 @@ input PageRequestInput {
   page: Int! = 0
   pageSize: Int! = 10
 }
+
+type Instructor {
+  id: ID!
+  email: String!
+  fullName: String!
+  bio: String
+}

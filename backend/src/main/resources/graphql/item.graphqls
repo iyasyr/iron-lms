@@ -1,11 +1,11 @@
 type Item {
   id: ID!
   lessonId: ID!
+  lesson: Lesson!
   title: String!
   description: String
   tags: [String!]!
   bodyMarkdown: String!
-  bodyHtml: String
   createdAt: DateTime!
   updatedAt: DateTime!
 }
