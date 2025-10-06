@@ -40,26 +40,7 @@ services:
       - ../backend:/app
       - maven_cache:/root/.m2
 
-  frontend:
-    image: node:20-alpine
-    container_name: ironlms-frontend-dev
-    working_dir: /app
-    # deps once (HMR)
-    command: sh -lc "yarn install --frozen-lockfile && yarn dev --host 0.0.0.0 --port 5173"
-    ports:
-      - "5173:5173"
-    environment:
-      VITE_API_URL: http://localhost:8080
-      YARN_CACHE_FOLDER: /tmp/.yarn-cache
-    volumes:
-      - ../frontend:/app
-      - /app/node_modules   # anononim mode
-      - yarn_cache:/tmp/.yarn-cache
-    depends_on:
-      backend:
-        condition: service_started
 
 volumes:
   mysql_data_dev:
   maven_cache:
-  yarn_cache:
