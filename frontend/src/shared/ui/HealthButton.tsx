@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { http } from '../api/http'
+import { httpClient } from '../api/http'
 
 export default function HealthButton() {
   const [status, setStatus] = useState<'idle' | 'ok' | 'down' | 'loading'>('idle')
@@ -7,7 +7,7 @@ export default function HealthButton() {
     <button
       onClick={async () => {
         try {
-          setStatus('loading'); const r = await http<{ status: string, db: string }>('/api/ping')
+          setStatus('loading'); const r = await httpClient.get<{ status: string, db: string }>('/api/ping')
           setStatus(r.status === 'ok' ? 'ok' : 'down')
         } catch { setStatus('down') }
       }}
