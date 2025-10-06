@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../shared/lib/AuthContext'
 import { LogOut, User, BookOpen, PlayCircle, Clock, Users, TrendingUp, Filter } from 'lucide-react'
-import { useGetCoursesQuery, useGetMyEnrollmentsQuery, useEnrollInCourseMutation, useMySubmissionsQuery } from '../../generated/graphql'
+import { useGetCoursesQuery, useGetMyEnrollmentsQuery, useMySubmissionsQuery } from '../../generated/graphql'
+import { httpClient } from '../../shared/api/http'
 import toast from 'react-hot-toast'
 import './DashboardPage.scss'
 
@@ -30,15 +32,7 @@ export default function DashboardPage() {
     toast.error('Failed to load enrollments')
   }
 
-  const [enrollInCourse, { loading: enrolling }] = useEnrollInCourseMutation({
-    onCompleted: () => {
-      toast.success('Successfully enrolled in course!')
-      refetchEnrollments()
-    },
-    onError: () => {
-      toast.error('Failed to enroll in course')
-    }
-  })
+  const [enrolling, setEnrolling] = useState(false)
 
   const courses = data?.courses?.content || []
   const totalCourses = data?.courses?.pageInfo?.totalElements || 0
@@ -64,9 +58,20 @@ export default function DashboardPage() {
 
   const handleEnroll = async (courseId: string) => {
     try {
-      await enrollInCourse({ variables: { courseId } })
+      setEnrolling(true)
+      console.log('Attempting to enroll in course:', courseId)
+      
+      // Use HTTP client to call the enrollment API
+      await httpClient.post(`/api/courses/${courseId}/enroll`)
+      
+      console.log('Enrollment successful')
+      toast.success('Successfully enrolled in course!')
+      refetchEnrollments()
     } catch (error) {
       console.error('Enrollment failed:', error)
+      toast.error('Failed to enroll in course')
+    } finally {
+      setEnrolling(false)
     }
   }
 

@@ -7,7 +7,7 @@ export default function HealthButton() {
     <button
       onClick={async () => {
         try {
-          setStatus('loading'); const r = await http<{ status: string, db: string }>('/api/ping')
+          setStatus('loading'); const r = await http.get<{ status: string, db: string }>('/api/ping')
           setStatus(r.status === 'ok' ? 'ok' : 'down')
         } catch { setStatus('down') }
       }}

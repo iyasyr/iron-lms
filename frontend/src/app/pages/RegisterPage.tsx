@@ -38,7 +38,7 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      await register(formData)
+      await register(formData.email, formData.password, `${formData.firstName} ${formData.lastName}`)
       toast.success('Registration successful!')
       navigate('/dashboard')
     } catch (error) {
@@ -50,6 +50,7 @@ export default function RegisterPage() {
 
   return (
     <AuthSplitLayout
+      splineUrl="https://my.spline.design/squarechipsfallinginplace-1phkABU3JGmivVWAN0Q6OU9J/"
       title="Create Account"
       subtitle="Join our learning community and start your journey"
       linkText="Already have an account?"

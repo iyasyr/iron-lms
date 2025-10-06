@@ -1,3 +1,5 @@
+import type { Course } from '../../../generated/graphql'
+
 export interface CourseFilters {
   search?: string
   status?: string

@@ -5,8 +5,8 @@ import { authAPI, type User } from '../api/auth'
 interface AuthContextType {
   user: User | null
   isAuthenticated: boolean
-  login: (email: string, password: string) => Promise<void>
-  register: (email: string, password: string, fullName: string) => Promise<void>
+  login: (email: string, password: string) => Promise<User>
+  register: (email: string, password: string, fullName: string) => Promise<User>
   logout: () => void
   loading: boolean
 }
@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<User> => {
     try {
       setLoading(true)
 
@@ -53,6 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(data.user)
 
       toast.success('Welcome back! 🎉')
+      return data.user
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Login failed')
       throw error
@@ -61,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const register = async (email: string, password: string, fullName: string) => {
+  const register = async (email: string, password: string, fullName: string): Promise<User> => {
     try {
       setLoading(true)
 
@@ -72,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(data.user)
 
       toast.success('Account created successfully! 🚀')
+      return data.user
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Registration failed')
       throw error
