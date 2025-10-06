@@ -27,3 +27,4 @@ export interface RegisterData {
   confirmPassword: string
 }
 
+
