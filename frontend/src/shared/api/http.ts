@@ -71,12 +71,9 @@ class HttpClient {
   }
 
   async patch<T>(endpoint: string, data?: unknown): Promise<T> {
-    return this.request<T>(endpoint, { 
-      method: 'PATCH', 
+    return this.request<T>(endpoint, {
+      method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined,
-      headers: {
-        'Content-Type': 'application/json'
-      }
     })
   }
 }

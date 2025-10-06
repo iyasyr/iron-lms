@@ -17,13 +17,13 @@ interface BaseSelectProps {
 
 interface SingleSelectProps extends BaseSelectProps {
   isMulti?: false
-  value: SelectOption | null
+  value?: SelectOption | null
   onChange: (option: SelectOption | null) => void
 }
 
 interface MultiSelectProps extends BaseSelectProps {
   isMulti: true
-  value: MultiValue<SelectOption>
+  value?: MultiValue<SelectOption>
   onChange: (option: MultiValue<SelectOption>) => void
 }
 
