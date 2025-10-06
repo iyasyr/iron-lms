@@ -164,9 +164,7 @@ public class DataInitializer {
         item.getTags().addAll(tags);
         item.setBodyMarkdown(bodyMarkdown);
 
-        // render + sanitize once on write
-        var html = markdown.toHtml(bodyMarkdown);
-        item.setBodyHtml(sanitizer.sanitize(html));
+        // bodyHtml field removed - only using markdown
 
         items.save(item);
     }

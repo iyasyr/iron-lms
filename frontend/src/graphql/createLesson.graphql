@@ -1,0 +1,9 @@
+mutation CreateLesson($input: LessonCreateInput!) {
+  createLesson(input: $input) {
+    id
+    courseId
+    title
+    orderIndex
+    __typename
+  }
+}

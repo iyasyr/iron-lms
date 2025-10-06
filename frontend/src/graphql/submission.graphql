@@ -1,0 +1,68 @@
+mutation Submit($assignmentId: ID!, $artifactUrl: String!) {
+  submit(assignmentId: $assignmentId, artifactUrl: $artifactUrl) {
+    id
+    assignmentId
+    courseId
+    studentId
+    submittedAt
+    artifactUrl
+    status
+    score
+    feedback
+    version
+    __typename
+  }
+}
+
+query MySubmissions($page: Int!, $pageSize: Int!) {
+  mySubmissions(page: $page, pageSize: $pageSize) {
+    content {
+      id
+      assignmentId
+      courseId
+      studentId
+      submittedAt
+      artifactUrl
+      status
+      score
+      feedback
+      version
+      __typename
+    }
+    pageInfo {
+      page
+      pageSize
+      totalElements
+      totalPages
+      hasNext
+    }
+    __typename
+  }
+}
+
+query SubmissionsByCourse($courseId: ID!, $page: Int!, $pageSize: Int!) {
+  submissionsByCourse(courseId: $courseId, page: $page, pageSize: $pageSize) {
+    content {
+      id
+      assignmentId
+      courseId
+      studentId
+      submittedAt
+      artifactUrl
+      status
+      score
+      feedback
+      version
+      __typename
+    }
+    pageInfo {
+      page
+      pageSize
+      totalElements
+      totalPages
+      hasNext
+    }
+    __typename
+  }
+}
+
