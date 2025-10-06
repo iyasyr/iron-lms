@@ -1,0 +1,22 @@
+extend type Query {
+  courses(page: Int! = 0, pageSize: Int! = 10): CoursePage!
+  course(id: ID!): Course!
+}
+
+type Course {
+  id: ID!
+  instructorId: ID!
+  instructor: Instructor!
+  title: String!
+  description: String
+  status: String!
+  createdAt: DateTime!
+  publishedAt: DateTime
+  lessons: [Lesson!]!          # resolved via @SchemaMapping
+  assignments: [Assignment!]!  # resolved via @SchemaMapping
+}
+
+type CoursePage {
+  content: [Course!]!
+  pageInfo: PageInfo!
+}

@@ -1,0 +1,18 @@
+query GetLesson($id: ID!) {
+  lesson(id: $id) {
+    id
+    courseId
+    title
+    orderIndex
+    item {
+      id
+      title
+      description
+      tags
+      bodyMarkdown
+      createdAt
+      updatedAt
+    }
+    __typename
+  }
+}

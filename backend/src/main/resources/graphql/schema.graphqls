@@ -1,0 +1,9 @@
+# This file is intentionally minimal - all types are defined in their respective .graphqls files
+
+type Query {
+  # All queries are defined in their respective .graphqls files
+}
+
+type Mutation {
+  # All mutations are defined in their respective .graphqls files
+}

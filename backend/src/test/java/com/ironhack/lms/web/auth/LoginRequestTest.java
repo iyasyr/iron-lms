@@ -1,5 +1,6 @@
 package com.ironhack.lms.web.auth;
 
+import com.ironhack.lms.web.auth.dto.LoginRequest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

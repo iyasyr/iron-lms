@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import com.ironhack.lms.web.graphql.GraphQLException;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +35,11 @@ public class EnrollmentService {
         return enrollments.findByStudent_Id(me.getId(), pageable).map(this::toDto);
     }
 
+    public Page<Enrollment> myEnrollmentsEntities(Authentication auth, Pageable pageable) {
+        Student me = requireStudent(auth);
+        return enrollments.findByStudent_Id(me.getId(), pageable);
+    }
+
     // --- Commands ---
 
     public EnrollmentResponse enroll(Long courseId, Authentication auth) {
@@ -45,7 +51,7 @@ public class EnrollmentService {
             throw notFound("Course");
         }
         if (enrollments.existsByCourse_IdAndStudent_Id(courseId, me.getId())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Already enrolled");
+            throw new GraphQLException.AlreadyEnrolledException("Already enrolled in this course");
         }
 
         Enrollment e = new Enrollment();

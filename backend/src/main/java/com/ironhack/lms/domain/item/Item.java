@@ -28,9 +28,6 @@ public class Item {
     @Lob @Column(name = "body_markdown", columnDefinition = "MEDIUMTEXT", nullable = false)
     private String bodyMarkdown;
 
-    @Lob @Column(name = "body_html", columnDefinition = "MEDIUMTEXT")
-    private String bodyHtml;
-
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "item_tags", joinColumns = @JoinColumn(name = "item_id"))
     @Column(name = "tag", nullable = false, length = 64)
