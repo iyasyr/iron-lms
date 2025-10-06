@@ -2,8 +2,8 @@ package com.ironhack.lms.web.auth.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "Authentication response containing JWT token and user information")
-public record LoginResponse(
+@Schema(description = "User registration response containing JWT token and user information")
+public record RegisterResponse(
         @Schema(description = "JWT token for API authentication", 
                 example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                 required = true)
@@ -27,3 +27,4 @@ public record LoginResponse(
             String role
     ) {}
 }
+
