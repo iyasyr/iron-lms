@@ -38,7 +38,7 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      await register(formData)
+      await register(formData.email, formData.password, `${formData.firstName} ${formData.lastName}`)
       toast.success('Registration successful!')
       navigate('/dashboard')
     } catch (error) {
@@ -49,14 +49,14 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthSplitLayout
-      title="Create Account"
-      subtitle="Join our learning community and start your journey"
-      linkText="Already have an account?"
-      linkPath="/login"
-      linkLabel="Sign in"
-    >
-      <form onSubmit={handleSubmit} className="auth-form">
+    <AuthSplitLayout>
+      <div className="auth-content">
+        <div className="auth-header">
+          <h1>Create Account</h1>
+          <p>Join our learning community and start your journey</p>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="auth-form">
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="firstName">First Name</label>
@@ -157,7 +157,17 @@ export default function RegisterPage() {
             </>
           )}
         </motion.button>
-      </form>
+        </form>
+        
+        <div className="auth-footer">
+          <p>
+            Already have an account?{' '}
+            <a href="/login" className="auth-link">
+              Sign in
+            </a>
+          </p>
+        </div>
+      </div>
     </AuthSplitLayout>
   )
 }

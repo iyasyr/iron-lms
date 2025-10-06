@@ -1,4 +1,4 @@
-import Select, { type StylesConfig, type SingleValue, type MultiValue } from 'react-select'
+import Select, { type StylesConfig, type MultiValue } from 'react-select'
 
 export interface SelectOption {
   value: string
@@ -7,8 +7,6 @@ export interface SelectOption {
 }
 
 interface BaseSelectProps {
-  value?: SelectOption | null
-  onChange: (option: SelectOption | null) => void
   options: SelectOption[]
   placeholder?: string
   isDisabled?: boolean
@@ -19,11 +17,13 @@ interface BaseSelectProps {
 
 interface SingleSelectProps extends BaseSelectProps {
   isMulti?: false
+  value?: SelectOption | null
   onChange: (option: SelectOption | null) => void
 }
 
 interface MultiSelectProps extends BaseSelectProps {
   isMulti: true
+  value?: MultiValue<SelectOption>
   onChange: (option: MultiValue<SelectOption>) => void
 }
 
@@ -121,7 +121,13 @@ export function CustomSelect(props: CustomSelectProps) {
   return (
     <Select
       value={value}
-      onChange={onChange}
+      onChange={(newValue) => {
+        if (props.isMulti) {
+          (onChange as (option: MultiValue<SelectOption>) => void)(newValue as MultiValue<SelectOption>)
+        } else {
+          (onChange as (option: SelectOption | null) => void)(newValue as SelectOption | null)
+        }
+      }}
       options={options}
       placeholder={placeholder}
       isDisabled={isDisabled}

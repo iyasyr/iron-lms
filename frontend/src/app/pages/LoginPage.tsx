@@ -30,14 +30,14 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthSplitLayout
-      title="Welcome Back"
-      subtitle="Sign in to your account to continue learning"
-      linkText="Don't have an account?"
-      linkPath="/register"
-      linkLabel="Sign up"
-    >
-      <form onSubmit={handleSubmit} className="auth-form">
+    <AuthSplitLayout>
+      <div className="auth-content">
+        <div className="auth-header">
+          <h1>Welcome Back</h1>
+          <p>Sign in to your account to continue learning</p>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="auth-form">
         <div className="form-group">
           <label htmlFor="email">Email</label>
           <input
@@ -87,7 +87,17 @@ export default function LoginPage() {
             </>
           )}
         </motion.button>
-      </form>
+        </form>
+        
+        <div className="auth-footer">
+          <p>
+            Don't have an account?{' '}
+            <a href="/register" className="auth-link">
+              Sign up
+            </a>
+          </p>
+        </div>
+      </div>
     </AuthSplitLayout>
   )
 }

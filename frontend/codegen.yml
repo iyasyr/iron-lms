@@ -13,6 +13,9 @@ generates:
       withHOC: false
       apolloReactHooksImportFrom: "@apollo/client/react"
       apolloReactCommonImportFrom: "@apollo/client/react"
+      skipTypename: false
+      withResultType: true
+      withVariablesType: true
 
 
 

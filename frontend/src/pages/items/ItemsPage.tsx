@@ -392,7 +392,7 @@ export default function ItemsPage() {
           item={editingItem}
           onSubmit={editingItem ? 
             (formData: ItemUpdateInput) => handleUpdate(editingItem.id, formData) : 
-            (formData: ItemCreateInput) => handleCreate(formData)
+            (formData: ItemCreateInput | ItemUpdateInput) => handleCreate(formData as ItemCreateInput)
           }
           onClose={() => {
             setShowCreateForm(false)

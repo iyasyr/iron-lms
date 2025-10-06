@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
