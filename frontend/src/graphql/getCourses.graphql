@@ -1,0 +1,39 @@
+query GetCourses($page: Int!, $pageSize: Int!) {
+  courses(page: $page, pageSize: $pageSize) {
+    content {
+      id
+      instructorId
+      title
+      description
+      status
+      createdAt
+      publishedAt
+      lessons {
+        id
+        title
+        orderIndex
+      }
+      assignments {
+        id
+        title
+        instructions
+        dueAt
+        maxPoints
+      }
+    }
+    pageInfo {
+      page
+      pageSize
+      totalElements
+      totalPages
+      hasNext
+    }
+  }
+}
+
+
+
+
+
+
+

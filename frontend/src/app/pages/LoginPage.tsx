@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
+  const { login, user } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,9 +19,14 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      await login(email, password)
+      const userData = await login(email, password)
       toast.success('Login successful!')
-      navigate('/dashboard')
+      // Redirect based on user role
+      if (userData?.role === 'INSTRUCTOR') {
+        navigate('/items')
+      } else {
+        navigate('/dashboard')
+      }
     } catch (error) {
       toast.error('Invalid credentials')
     } finally {
@@ -30,14 +35,15 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthSplitLayout>
-      <div className="auth-content">
-        <div className="auth-header">
-          <h1>Welcome Back</h1>
-          <p>Sign in to your account to continue learning</p>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="auth-form">
+    <AuthSplitLayout
+      splineUrl="https://my.spline.design/squarechipsfallinginplace-1phkABU3JGmivVWAN0Q6OU9J/"
+      title="Welcome Back"
+      subtitle="Sign in to your account to continue learning"
+      linkText="Don't have an account?"
+      linkPath="/register"
+      linkLabel="Sign up"
+    >
+      <form onSubmit={handleSubmit} className="auth-form">
         <div className="form-group">
           <label htmlFor="email">Email</label>
           <input
@@ -87,17 +93,7 @@ export default function LoginPage() {
             </>
           )}
         </motion.button>
-        </form>
-        
-        <div className="auth-footer">
-          <p>
-            Don't have an account?{' '}
-            <a href="/register" className="auth-link">
-              Sign up
-            </a>
-          </p>
-        </div>
-      </div>
+      </form>
     </AuthSplitLayout>
   )
 }

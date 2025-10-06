@@ -5,11 +5,24 @@ import "./AuthSplitLayout.scss";
 
 export type AuthSplitLayoutProps = {
   splineUrl?: string;
+  title?: string;
+  subtitle?: string;
+  linkText?: string;
+  linkPath?: string;
+  linkLabel?: string;
   children: React.ReactNode;
 };
 
 
-export default function AuthSplitLayout({ splineUrl, children }: AuthSplitLayoutProps) {
+export default function AuthSplitLayout({ 
+  splineUrl, 
+  title, 
+  subtitle, 
+  linkText, 
+  linkPath, 
+  linkLabel, 
+  children 
+}: AuthSplitLayoutProps) {
   return (
     <div className="authSplit">
       <div className="authSplit__left" aria-hidden={!splineUrl ? "true" : "false"}>
@@ -29,7 +42,20 @@ export default function AuthSplitLayout({ splineUrl, children }: AuthSplitLayout
 
 
       <div className="authSplit__right">
-        {children}
+        <div className="auth-content">
+          <div className="auth-header">
+            {title && <h1>{title}</h1>}
+            {subtitle && <p>{subtitle}</p>}
+          </div>
+          
+          {children}
+          
+          {linkText && linkPath && linkLabel && (
+            <div className="auth-footer">
+              <p>{linkText} <a href={linkPath}>{linkLabel}</a></p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

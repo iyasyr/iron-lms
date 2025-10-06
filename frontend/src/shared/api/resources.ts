@@ -19,6 +19,5 @@ export const createResource = (input: Partial<Resource>) =>
 
 export const updateResource = (id: number, input: Partial<Resource>) =>
   httpClient.put<Resource>(`/api/items/${id}`, input)
-
 export const deleteResource = (id: number) =>
   httpClient.delete<boolean>(`/api/items/${id}`)

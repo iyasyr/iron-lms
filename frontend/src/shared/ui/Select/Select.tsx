@@ -115,24 +115,28 @@ export function CustomSelect(props: CustomSelectProps) {
     isClearable = true,
     isLoading = false,
     className = '',
+    isMulti = false,
     ...restProps
   } = props
+
+  const handleChange = (newValue: any) => {
+    if (isMulti) {
+      (onChange as (option: MultiValue<SelectOption>) => void)(newValue as MultiValue<SelectOption>)
+    } else {
+      (onChange as (option: SelectOption | null) => void)(newValue as SelectOption | null)
+    }
+  }
 
   return (
     <Select
       value={value}
-      onChange={(newValue) => {
-        if (props.isMulti) {
-          (onChange as (option: MultiValue<SelectOption>) => void)(newValue as MultiValue<SelectOption>)
-        } else {
-          (onChange as (option: SelectOption | null) => void)(newValue as SelectOption | null)
-        }
-      }}
+      onChange={handleChange}
       options={options}
       placeholder={placeholder}
       isDisabled={isDisabled}
       isClearable={isClearable}
       isLoading={isLoading}
+      isMulti={isMulti}
       styles={customSelectStyles}
       className={className}
       {...restProps}
