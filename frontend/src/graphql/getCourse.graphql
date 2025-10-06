@@ -1,0 +1,36 @@
+query GetCourse($id: ID!) {
+  course(id: $id) {
+    id
+    instructorId
+    title
+    description
+    status
+    createdAt
+    publishedAt
+    lessons {
+      id
+      title
+      orderIndex
+      item {
+        id
+        title
+        description
+        tags
+        bodyMarkdown
+        createdAt
+        updatedAt
+      }
+      __typename
+    }
+    assignments {
+      id
+      title
+      instructions
+      dueAt
+      maxPoints
+      allowLate
+      __typename
+    }
+    __typename
+  }
+}

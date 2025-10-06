@@ -1,0 +1,23 @@
+extend type Query {
+  myEnrollments(page: Int! = 0, pageSize: Int! = 10): EnrollmentPage!
+}
+
+extend type Mutation {
+  enrollInCourse(courseId: ID!): Enrollment!
+  cancelEnrollment(enrollmentId: ID!): Enrollment!
+}
+
+type Enrollment {
+  id: ID!
+  courseId: ID!
+  studentId: ID!
+  enrolledAt: DateTime!
+  status: String!
+  course: Course!
+}
+
+type EnrollmentPage {
+  content: [Enrollment!]!
+  pageInfo: PageInfo!
+}
+

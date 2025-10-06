@@ -3,7 +3,9 @@ package com.ironhack.lms.service.item;
 import com.ironhack.lms.service.content.HtmlSanitizer;
 import com.ironhack.lms.service.content.MarkdownService;
 import com.ironhack.lms.domain.course.Lesson;
+import com.ironhack.lms.domain.course.Course;
 import com.ironhack.lms.domain.item.Item;
+import com.ironhack.lms.domain.user.Instructor;
 import com.ironhack.lms.repository.course.LessonRepository;
 import com.ironhack.lms.repository.item.ItemRepository;
 import com.ironhack.lms.web.item.dto.ItemCreateRequest;
@@ -49,7 +51,6 @@ public class ItemService {
         i.setDescription(description);
         i.setTags(tags != null ? new LinkedHashSet<>(tags) : new LinkedHashSet<>());
         i.setBodyMarkdown(bodyMarkdown);
-        i.setBodyHtml(sanitizer.sanitize(md.toHtml(bodyMarkdown)));
 
         return items.save(i);
     }
@@ -67,10 +68,13 @@ public class ItemService {
         }
         if (bodyMarkdown != null) {
             i.setBodyMarkdown(bodyMarkdown);
-            i.setBodyHtml(sanitizer.sanitize(md.toHtml(bodyMarkdown)));
         }
 
-        return items.save(i);
+        items.save(i);
+        
+        // Return the updated item with all relationships loaded
+        return items.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found after update"));
     }
 
     @Transactional(readOnly = true)
@@ -103,7 +107,6 @@ public class ItemService {
         entity.getTags().clear();
         if (req.tags() != null) entity.getTags().addAll(req.tags());
         entity.setBodyMarkdown(req.bodyMarkdown());
-        entity.setBodyHtml(sanitizer.sanitize(md.toHtml(req.bodyMarkdown())));
 
         Item saved = items.save(entity);
         return toResponse(saved);
@@ -125,7 +128,6 @@ public class ItemService {
         if (req.tags() != null) { e.getTags().clear(); e.getTags().addAll(req.tags()); }
         if (req.bodyMarkdown() != null) {
             e.setBodyMarkdown(req.bodyMarkdown());
-            e.setBodyHtml(sanitizer.sanitize(md.toHtml(req.bodyMarkdown())));
         }
 
         e = items.save(e);
@@ -163,9 +165,35 @@ public class ItemService {
                 e.getDescription(),
                 e.getTags(),
                 e.getBodyMarkdown(),
-                e.getBodyHtml(),
                 e.getCreatedAt(),
                 e.getUpdatedAt()
         );
+    }
+
+    // Authorization methods
+    @Transactional(readOnly = true)
+    public void verifyInstructorOwnsCourse(Long lessonId, String instructorEmail) {
+        Lesson lesson = lessons.findById(lessonId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
+        
+        Course course = lesson.getCourse();
+        Instructor instructor = course.getInstructor();
+        
+        if (!instructor.getEmail().equals(instructorEmail)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only modify items in your own courses");
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public void verifyInstructorOwnsItem(Long itemId, String instructorEmail) {
+        Item item = items.findByIdWithFullRelations(itemId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
+        
+        Course course = item.getLesson().getCourse();
+        Instructor instructor = course.getInstructor();
+        
+        if (!instructor.getEmail().equals(instructorEmail)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only modify items in your own courses");
+        }
     }
 }

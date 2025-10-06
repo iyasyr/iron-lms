@@ -10,7 +10,6 @@ public record ItemGql(
         String description,
         Set<String> tags,
         String bodyMarkdown,
-        String bodyHtml,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
 ) {}

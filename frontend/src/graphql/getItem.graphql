@@ -1,0 +1,13 @@
+query GetItem($id: ID!) {
+  item(id: $id) {
+    id
+    lessonId
+    title
+    description
+    tags
+    bodyMarkdown
+    createdAt
+    updatedAt
+    __typename
+  }
+}

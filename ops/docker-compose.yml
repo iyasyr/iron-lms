@@ -38,20 +38,6 @@ services:
       - "8080:8080"           
     restart: unless-stopped
 
-  frontend:
-    build:
-      context: ../
-      dockerfile: frontend/Dockerfile
-      args:
-        VITE_API_URL: /api
-    container_name: ironlms-frontend
-    depends_on:
-      - backend
-    ports:
-      - "5173:80"
-    restart: unless-stopped
-    environment:
-      - YARN_CACHE_FOLDER=/tmp/.yarn-cache
 
 volumes:
   mysql_data:
