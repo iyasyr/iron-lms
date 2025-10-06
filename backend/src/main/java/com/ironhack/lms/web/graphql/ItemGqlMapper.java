@@ -26,7 +26,6 @@ public final class ItemGqlMapper {
                 i.getDescription(),
                 i.getTags(),
                 i.getBodyMarkdown(),
-                i.getBodyHtml(),
                 toOffset(i.getCreatedAt()),
                 toOffset(i.getUpdatedAt())
         );

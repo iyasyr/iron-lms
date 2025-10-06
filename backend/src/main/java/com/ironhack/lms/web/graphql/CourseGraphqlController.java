@@ -2,6 +2,7 @@ package com.ironhack.lms.web.graphql;
 
 import com.ironhack.lms.domain.course.Course;
 import com.ironhack.lms.domain.course.Lesson;
+import com.ironhack.lms.domain.user.Instructor;
 import com.ironhack.lms.service.course.CourseService;
 import com.ironhack.lms.repository.course.CourseRepository;
 import com.ironhack.lms.repository.course.LessonRepository;
@@ -67,5 +68,13 @@ public class CourseGraphqlController {
                         a.dueAt() == null ? null : a.dueAt().atOffset(java.time.ZoneOffset.UTC)
                 ))
                 .toList();
+    }
+
+    @SchemaMapping(typeName = "Course", field = "instructor")
+    @Transactional(readOnly = true)
+    public InstructorGql instructor(CourseGql course) {
+        Course courseEntity = courses.findById(course.id())
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+        return InstructorGqlMapper.toGql(courseEntity.getInstructor());
     }
 }

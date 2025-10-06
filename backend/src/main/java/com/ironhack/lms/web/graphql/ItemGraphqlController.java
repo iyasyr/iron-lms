@@ -1,5 +1,9 @@
 package com.ironhack.lms.web.graphql;
 
+import com.ironhack.lms.domain.item.Item;
+import com.ironhack.lms.domain.course.Lesson;
+import com.ironhack.lms.domain.course.Course;
+import com.ironhack.lms.domain.user.Instructor;
 import com.ironhack.lms.service.item.ItemService;
 import com.ironhack.lms.web.graphql.input.ItemCreateInput;
 import com.ironhack.lms.web.graphql.input.ItemUpdateInput;
@@ -7,6 +11,8 @@ import com.ironhack.lms.web.graphql.types.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.graphql.data.method.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +36,11 @@ public class ItemGraphqlController {
 
     @MutationMapping
     @Transactional
-    public ItemGql createItem(@Argument ItemCreateInput input) {
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    public ItemGql createItem(@Argument ItemCreateInput input, Authentication auth) {
+        // Verify that the instructor owns the course
+        items.verifyInstructorOwnsCourse(input.lessonId(), auth.getName());
+        
         var created = items.createEntity(input.lessonId(), input.title(), input.description(),
                 input.tags(), input.bodyMarkdown());
         return ItemGqlMapper.toGql(created);
@@ -38,7 +48,11 @@ public class ItemGraphqlController {
 
     @MutationMapping
     @Transactional
-    public ItemGql updateItem(@Argument Long id, @Argument ItemUpdateInput input) {
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    public ItemGql updateItem(@Argument Long id, @Argument ItemUpdateInput input, Authentication auth) {
+        // Verify that the instructor owns the course
+        items.verifyInstructorOwnsItem(id, auth.getName());
+        
         var updated = items.updateEntity(id, input.title(), input.description(),
                 input.tags(), input.bodyMarkdown());
         return ItemGqlMapper.toGql(updated);
@@ -46,8 +60,18 @@ public class ItemGraphqlController {
 
     @MutationMapping
     @Transactional
-    public Boolean deleteItem(@Argument Long id) {
-        items.delete(id); // keep your existing REST delete; or add a new one that deletes by id
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    public Boolean deleteItem(@Argument Long id, Authentication auth) {
+        // Verify that the instructor owns the course
+        items.verifyInstructorOwnsItem(id, auth.getName());
+        
+        items.delete(id);
         return true;
+    }
+
+    // Schema mappings for nested objects
+    @SchemaMapping(typeName = "Item", field = "lesson")
+    public LessonGql lesson(Item item) {
+        return LessonGqlMapper.toGql(item.getLesson());
     }
 }
