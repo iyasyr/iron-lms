@@ -1,0 +1,14 @@
+mutation CreateItem($input: ItemCreateInput!) {
+  createItem(input: $input) {
+    id
+    lessonId
+    title
+    description
+    tags
+    bodyMarkdown
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
