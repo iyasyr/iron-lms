@@ -379,3 +379,4 @@ For questions or support, please open an issue in the repository or contact the 
 ---
 
 **Built with ❤️ using modern web technologies and best practices.**
+
