@@ -1,0 +1,728 @@
+.course-page {
+  min-height: 100vh;
+  background: var(--gradient-background);
+  padding: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.course-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.course-header {
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.course-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  align-self: flex-start;
+}
+
+.course-title-section {
+  text-align: center;
+}
+
+.course-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.course-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.status {
+  background: rgba(67, 233, 123, 0.2);
+  padding: 4px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+}
+
+.instructor {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+}
+
+.course-description {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  padding: 16px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.stat-content h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.stat-content p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+}
+
+.course-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.section {
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  margin-bottom: 24px;
+}
+
+.section-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.section-header p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+}
+
+.lessons-list, .assignments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lesson-card, .assignment-card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 20px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.lesson-card:hover, .assignment-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.lesson-header, .assignment-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.lesson-number {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.lesson-info, .assignment-header {
+  flex: 1;
+}
+
+.lesson-info h3, .assignment-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.lesson-description, .assignment-instructions {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.lesson-status {
+  flex-shrink: 0;
+}
+
+.status-icon {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.lesson-content {
+  margin-bottom: 16px;
+}
+
+.content-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tag {
+  background: rgba(67, 233, 123, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.content-preview {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.markdown-content {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  line-height: 1.4;
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    margin: 8px 0 4px 0;
+  }
+  
+  h1 { font-size: 16px; }
+  h2 { font-size: 15px; }
+  h3 { font-size: 14px; }
+  h4, h5, h6 { font-size: 13px; }
+  
+  p {
+    margin: 4px 0;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  ul, ol {
+    margin: 4px 0;
+    padding-left: 16px;
+  }
+  
+  li {
+    margin: 2px 0;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  code {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+  }
+  
+  pre {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 8px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 4px 0;
+    
+    code {
+      background: none;
+      padding: 0;
+    }
+  }
+  
+  blockquote {
+    border-left: 3px solid rgba(67, 233, 123, 0.5);
+    padding-left: 12px;
+    margin: 4px 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-style: italic;
+  }
+  
+  a {
+    color: rgba(67, 233, 123, 0.8);
+    text-decoration: none;
+    
+    &:hover {
+      color: rgba(67, 233, 123, 1);
+      text-decoration: underline;
+    }
+  }
+  
+  strong, b {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+  }
+  
+  em, i {
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+
+.assignment-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.points {
+  background: rgba(67, 233, 123, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  align-self: flex-start;
+}
+
+.due-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+}
+
+.submission-status {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  
+  &.submitted {
+    background: rgba(67, 233, 123, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+.assignment-options {
+  margin-bottom: 16px;
+}
+
+.allow-late {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.allow-late.allowed {
+  background: rgba(67, 233, 123, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.allow-late.not-allowed {
+  background: rgba(239, 68, 68, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.lesson-button, .assignment-button {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.submission-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.url-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  z-index: 1;
+}
+
+.url-input {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: rgba(67, 233, 123, 0.5);
+    box-shadow: 0 0 0 3px rgba(67, 233, 123, 0.1);
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+}
+
+.submit-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  width: 100%;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.submission-completed {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.completed-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(67, 233, 123, 0.1);
+  border: 1px solid rgba(67, 233, 123, 0.3);
+  border-radius: 12px;
+}
+
+.status-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.check-icon {
+  color: rgba(67, 233, 123, 0.9);
+}
+
+.status-text {
+  flex: 1;
+}
+
+.status-text h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.status-text p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.resubmit-button {
+  align-self: flex-start;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.empty-state, .loading-state, .error-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.empty-state svg, .loading-state svg {
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.empty-state h3, .loading-state h3, .error-state h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (min-width: 768px) {
+  .course-page {
+    padding: 16px;
+  }
+  
+  .course-header {
+    padding: 24px;
+    border-radius: 24px;
+    margin-bottom: 32px;
+  }
+  
+  .course-title {
+    font-size: 32px;
+  }
+  
+  .course-meta {
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+  }
+  
+  .status, .instructor {
+    font-size: 14px;
+  }
+  
+  .course-description {
+    font-size: 16px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+  
+  .stat-card {
+    padding: 24px;
+  }
+  
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .stat-content h3 {
+    font-size: 24px;
+  }
+  
+  .stat-content p {
+    font-size: 14px;
+  }
+  
+  .course-content {
+    gap: 32px;
+  }
+  
+  .section {
+    padding: 32px;
+    border-radius: 24px;
+  }
+  
+  .section-header h2 {
+    font-size: 28px;
+  }
+  
+  .section-header p {
+    font-size: 16px;
+  }
+  
+  .lessons-list, .assignments-list {
+    gap: 20px;
+  }
+  
+  .lesson-card, .assignment-card {
+    padding: 24px;
+  }
+  
+  .lesson-number {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+  
+  .lesson-info h3, .assignment-header h3 {
+    font-size: 20px;
+  }
+  
+  .lesson-description, .assignment-instructions {
+    font-size: 14px;
+  }
+  
+  .markdown-content {
+    font-size: 14px;
+    
+    h1 { font-size: 18px; }
+    h2 { font-size: 17px; }
+    h3 { font-size: 16px; }
+    h4, h5, h6 { font-size: 15px; }
+    
+    code {
+      font-size: 13px;
+    }
+  }
+  
+  .lesson-button, .assignment-button {
+    padding: 12px 16px;
+  }
+
+  .url-input {
+    padding: 14px 14px 14px 44px;
+    font-size: 14px;
+  }
+
+  .submit-button {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+
+  .completed-status {
+    padding: 20px;
+  }
+
+  .status-text h4 {
+    font-size: 18px;
+  }
+
+  .status-text p {
+    font-size: 15px;
+  }
+
+  .resubmit-button {
+    padding: 10px 18px;
+    font-size: 15px;
+  }
+  
+  .empty-state, .loading-state, .error-state {
+    padding: 48px 24px;
+  }
+  
+  .empty-state h3, .loading-state h3, .error-state h3 {
+    font-size: 20px;
+  }
+  
+  .spinner {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .course-header {
+    padding: 32px;
+  }
+  
+  .course-title {
+    font-size: 36px;
+  }
+  
+  .course-description {
+    font-size: 18px;
+  }
+  
+  .lesson-header, .assignment-header {
+    gap: 20px;
+  }
+  
+  .lesson-number {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+  }
+  
+  .lesson-info h3, .assignment-header h3 {
+    font-size: 22px;
+  }
+  
+  .markdown-content {
+    font-size: 15px;
+    
+    h1 { font-size: 20px; }
+    h2 { font-size: 19px; }
+    h3 { font-size: 18px; }
+    h4, h5, h6 { font-size: 17px; }
+    
+    code {
+      font-size: 14px;
+    }
+  }
+}
+

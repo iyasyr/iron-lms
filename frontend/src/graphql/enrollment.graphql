@@ -1,0 +1,66 @@
+query GetMyEnrollments($page: Int!, $pageSize: Int!) {
+  myEnrollments(page: $page, pageSize: $pageSize) {
+    content {
+      id
+      courseId
+      studentId
+      enrolledAt
+      status
+      course {
+        id
+        instructorId
+        title
+        description
+        status
+        createdAt
+        publishedAt
+        lessons {
+          id
+          title
+          orderIndex
+        }
+        assignments {
+          id
+          title
+          instructions
+          dueAt
+          maxPoints
+        }
+      }
+    }
+    pageInfo {
+      page
+      pageSize
+      totalElements
+      totalPages
+      hasNext
+    }
+  }
+}
+
+mutation EnrollInCourse($courseId: ID!) {
+  enrollInCourse(courseId: $courseId) {
+    id
+    courseId
+    studentId
+    enrolledAt
+    status
+    course {
+      id
+      title
+      description
+      status
+    }
+  }
+}
+
+mutation CancelEnrollment($enrollmentId: ID!) {
+  cancelEnrollment(enrollmentId: $enrollmentId) {
+    id
+    courseId
+    studentId
+    enrolledAt
+    status
+  }
+}
+

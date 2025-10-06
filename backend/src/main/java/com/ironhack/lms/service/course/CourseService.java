@@ -198,30 +198,12 @@ public class CourseService {
         Course c = courses.findById(courseId).orElseThrow(() -> notFound("Course"));
 
         if (c.getStatus() == CourseStatus.PUBLISHED) {
-            if (auth != null) {
-                User u = users.findByEmail(auth.getName()).orElse(null);
-                if (u != null) {
-                    if (u.getRole() == Role.ADMIN ||
-                            (u.getRole() == Role.INSTRUCTOR && c.getInstructor().getId().equals(u.getId()))) {
-                        return lessons.findByCourse_IdOrderByOrderIndexAsc(courseId).stream()
-                                .map(l -> new LessonSummaryResponse(l.getId(), l.getTitle(), null, l.getOrderIndex()))
-                                .toList();
-                    }
-                    if (u.getRole() == Role.STUDENT && u instanceof Student student) {
-                        boolean isEnrolled = enrollments.existsByCourse_IdAndStudent_IdAndStatus(
-                                courseId, student.getId(), EnrollmentStatus.ACTIVE);
-                        if (!isEnrolled) {
-                            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be enrolled to access lessons");
-                        }
-                        return lessons.findByCourse_IdOrderByOrderIndexAsc(courseId).stream()
-                                .map(l -> new LessonSummaryResponse(l.getId(), l.getTitle(), null, l.getOrderIndex()))
-                                .toList();
-                    }
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be enrolled to access lessons");
-                }
-            }
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be enrolled to access lessons");
+            // For published courses, allow public access to lesson list
+            return lessons.findByCourse_IdOrderByOrderIndexAsc(courseId).stream()
+                    .map(l -> new LessonSummaryResponse(l.getId(), l.getTitle(), null, l.getOrderIndex()))
+                    .toList();
         } else {
+            // For draft courses, require owner or admin access
             requireOwnerOrAdmin(auth, c);
             return lessons.findByCourse_IdOrderByOrderIndexAsc(courseId).stream()
                     .map(l -> new LessonSummaryResponse(l.getId(), l.getTitle(), null, l.getOrderIndex()))
@@ -233,32 +215,13 @@ public class CourseService {
         Course c = courses.findById(courseId).orElseThrow(() -> notFound("Course"));
 
         if (c.getStatus() == CourseStatus.PUBLISHED) {
-            if (auth != null) {
-                User u = users.findByEmail(auth.getName()).orElse(null);
-                if (u != null) {
-                    if (u.getRole() == Role.ADMIN ||
-                            (u.getRole() == Role.INSTRUCTOR && c.getInstructor().getId().equals(u.getId()))) {
-                        return assignments.findByLesson_Course_Id(courseId).stream()
-                                .map(a -> new AssignmentSummaryResponse(a.getId(), a.getTitle(), a.getInstructions(),
-                                        a.getMaxPoints(), a.isAllowLate(), a.getDueAt()))
-                                .toList();
-                    }
-                    if (u.getRole() == Role.STUDENT && u instanceof Student student) {
-                        boolean isEnrolled = enrollments.existsByCourse_IdAndStudent_IdAndStatus(
-                                courseId, student.getId(), EnrollmentStatus.ACTIVE);
-                        if (!isEnrolled) {
-                            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be enrolled to access assignments");
-                        }
-                        return assignments.findByLesson_Course_Id(courseId).stream()
-                                .map(a -> new AssignmentSummaryResponse(a.getId(), a.getTitle(), a.getInstructions(),
-                                        a.getMaxPoints(), a.isAllowLate(), a.getDueAt()))
-                                .toList();
-                    }
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be enrolled to access assignments");
-                }
-            }
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be enrolled to access assignments");
+            // For published courses, allow public access to assignment list
+            return assignments.findByLesson_Course_Id(courseId).stream()
+                    .map(a -> new AssignmentSummaryResponse(a.getId(), a.getTitle(), a.getInstructions(),
+                            a.getMaxPoints(), a.isAllowLate(), a.getDueAt()))
+                    .toList();
         } else {
+            // For draft courses, require owner or admin access
             requireOwnerOrAdmin(auth, c);
             return assignments.findByLesson_Course_Id(courseId).stream()
                     .map(a -> new AssignmentSummaryResponse(a.getId(), a.getTitle(), a.getInstructions(),

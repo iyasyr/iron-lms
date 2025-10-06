@@ -1,0 +1,37 @@
+type Assignment {
+  id: ID!
+  courseId: ID
+  lessonId: ID
+  title: String!
+  instructions: String
+  maxPoints: Int!
+  allowLate: Boolean!
+  dueAt: DateTime
+}
+
+extend type Query {
+  assignment(id: ID!): Assignment
+}
+
+extend type Mutation {
+  createAssignment(input: AssignmentCreateInput!): Assignment!
+  updateAssignment(id: ID!, input: AssignmentUpdateInput!): Assignment!
+  deleteAssignment(id: ID!): Boolean!
+}
+
+input AssignmentCreateInput {
+  lessonId: ID!          # <-- add this
+  title: String!
+  instructions: String
+  dueAt: DateTime
+  maxPoints: Int!
+  allowLate: Boolean!
+}
+
+input AssignmentUpdateInput {
+  title: String
+  instructions: String
+  dueAt: DateTime
+  maxPoints: Int
+  allowLate: Boolean
+}

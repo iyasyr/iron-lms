@@ -1,0 +1,22 @@
+extend type Query {
+  lesson(id: ID!): Lesson
+}
+
+extend type Mutation {
+  createLesson(input: LessonCreateInput!): Lesson!
+}
+
+input LessonCreateInput {
+  courseId: ID!
+  title: String!
+  orderIndex: Int!
+}
+
+type Lesson {
+  id: ID!
+  courseId: ID!
+  course: Course!
+  title: String!
+  orderIndex: Int!
+  item: Item     # resolved via @SchemaMapping (1:1)
+}

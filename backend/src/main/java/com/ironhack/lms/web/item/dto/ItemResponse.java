@@ -10,7 +10,6 @@ public record ItemResponse(
         String description,
         Set<String> tags,
         String bodyMarkdown,
-        String bodyHtml,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {}

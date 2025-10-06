@@ -2,6 +2,7 @@ package com.ironhack.lms.web.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ironhack.lms.service.auth.JwtService;
+import com.ironhack.lms.web.auth.dto.LoginRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
