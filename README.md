@@ -372,6 +372,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [x] Comprehensive error handling
 - [x] Production-ready Docker setup
 
+## 🔗 Project Links
+
+- 🎥 **Presentation:** [Watch the Project Presentation](https://gamma.app/docs/Project-LMS-Ilia--y8vqe8fqvwrw3wb)
+- 🌐 **Frontend (Live Demo):** [Visit IronLMS Frontend](https://iron-lms.vercel.app/login)
+- ⚙️ **Backend:** *Not deployed* — Due to hosting limitations, the backend (Spring Boot + PostgreSQL) cannot be deployed for free.  
+  However, the full source code and Docker setup are included for local deployment.
+
+
 ## 📞 Support
 
 For questions or support, please open an issue in the repository or contact the development team.
